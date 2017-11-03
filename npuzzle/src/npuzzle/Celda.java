@@ -1,11 +1,11 @@
 package npuzzle;
 
+import java.awt.Point;
+
 public class Celda {
 	private int valor;
 	private int x;
 	private int y;
-
-	private Celda padre;
 
 	public Celda() {
 
@@ -13,8 +13,6 @@ public class Celda {
 
 	public Celda(Celda celda) {
 		this.valor = celda.valor;
-		this.x = celda.x;
-		this.y = celda.y;
 	}
 
 	public Celda(int numero) {
@@ -30,7 +28,7 @@ public class Celda {
 
 	@Override
 	public String toString() {
-		return "Celda [valor=" + valor + ", x=" + x + ", y=" + y + "]";
+		return Integer.toString(valor);
 	}
 
 	public int getValor() {
@@ -45,23 +43,12 @@ public class Celda {
 		return x;
 	}
 
-	public void setX(int x) {
-		this.x = x;
-	}
-
 	public int getY() {
 		return y;
 	}
 
-	public void setY(int y) {
-		this.y = y;
-	}
-
-	public Celda getPadre() {
-		return padre;
-	}
-
-	public void setPadre(Celda padre) {
-		this.padre = padre;
+	public void setPosicion(Point posicion) {
+		this.x = posicion.x;
+		this.y = posicion.y;
 	}
 }
