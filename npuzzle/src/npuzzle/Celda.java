@@ -2,17 +2,14 @@ package npuzzle;
 
 import java.awt.Point;
 
+//Cada celde dentro de nuestro nPuzzle de 3x3. (Esto es aplicable a NxN)
 public class Celda {
 	private int valor;
 	private int x;
 	private int y;
 
 	public Celda() {
-
-	}
-
-	public Celda(Celda celda) {
-		this.valor = celda.valor;
+		super();
 	}
 
 	public Celda(int numero) {

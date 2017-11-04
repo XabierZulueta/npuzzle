@@ -2,10 +2,14 @@ package npuzzle;
 
 import java.awt.Point;
 import java.util.ArrayList;
+//Cada nPuzzle que salga a partir del primero, nuestros estados.
 
 public class Estado {
+	// Coste de cada operador.
 	private static int COSTE_OPERADOR = 1;
-	public static Estado estadoFinal = new Estado();
+	// Estado final que será el que queramos alcanzar. (SOLO PARA 3x3). (Habria
+	// que modificarlo para NxN).
+	protected static Estado estadoFinal = new Estado();
 	static {
 		estadoFinal.numeros.get(0).add(new Celda(1, 0, 0));
 		estadoFinal.numeros.get(0).add(new Celda(2, 0, 1));
@@ -17,27 +21,31 @@ public class Estado {
 		estadoFinal.numeros.get(2).add(new Celda(6, 2, 1));
 		estadoFinal.numeros.get(2).add(new Celda(5, 2, 2));
 	}
+	// Celdas dentro de nuestro nPuzzle.
 	private ArrayList<ArrayList<Celda>> numeros;
+	// Coste acumulado de un estado determinado.
 	private int coste;
-
+	// Para el backtracking.
 	private Estado padre;
 
-	public Estado() {
-		// 1 2 3 || 8 0 4 || 6 5 4
+	protected Estado() {
+		// Inizialización de variables.
 		numeros = new ArrayList<>(3);
 		numeros.add(new ArrayList<>(3));
 		numeros.add(new ArrayList<>(3));
 		numeros.add(new ArrayList<>(3));
 	}
 
-	public Estado(Estado anterior) {
+	// Copy de un estado dado
+	protected Estado(Estado anterior) {
 		this.numeros = copyArray(anterior.numeros);
-		new ArrayList<>(anterior.numeros);
 		this.coste = anterior.coste;
 		this.addCoste();
 		this.padre = anterior;
 	}
 
+	// En java hay que reinicializar todas las variables por problemas de
+	// pointers. Cada nueevo estado tiene que tener sus propios atributos.
 	private ArrayList<ArrayList<Celda>> copyArray(ArrayList<ArrayList<Celda>> numeros2) {
 		ArrayList<ArrayList<Celda>> numeros = new ArrayList<>(3);
 		numeros.add(new ArrayList<>(3));
@@ -73,19 +81,7 @@ public class Estado {
 		return numeros;
 	}
 
-	public void addCoste() {
-		coste += COSTE_OPERADOR;
-	}
-
-	public Estado getPadre() {
-		return padre;
-	}
-
-	public void setPadre(Estado padre) {
-		this.padre = padre;
-	}
-
-	public Double getHCasillasCambiadas() {
+	private Double getHCasillasCambiadas() {
 		double h1 = 0d;
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
@@ -97,7 +93,7 @@ public class Estado {
 		return h1;
 	}
 
-	public Double getHManhattan() {
+	private Double getHManhattan() {
 		double h2 = 0d;
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
@@ -110,17 +106,8 @@ public class Estado {
 		return h2;
 	}
 
-	public void generateNewPuzzle() {
-		// TODO: random with scanner.
-		this.numeros.get(0).add(new Celda(1, 0, 0));
-		this.numeros.get(0).add(new Celda(3, 0, 1));
-		this.numeros.get(0).add(new Celda(0, 0, 2));
-		this.numeros.get(1).add(new Celda(6, 1, 0));
-		this.numeros.get(1).add(new Celda(2, 1, 1));
-		this.numeros.get(1).add(new Celda(4, 1, 2));
-		this.numeros.get(2).add(new Celda(8, 2, 0));
-		this.numeros.get(2).add(new Celda(7, 2, 1));
-		this.numeros.get(2).add(new Celda(5, 2, 2));
+	protected Double getHeuristica(boolean manhattan) {
+		return manhattan ? getHManhattan() : getHCasillasCambiadas();
 	}
 
 	private Celda getCeldaByValorEstadoFinal(int valor) {
@@ -145,7 +132,8 @@ public class Estado {
 		throw new NullPointerException("value missing - " + valor);
 	}
 
-	public Point getPosicion(int valor) {
+	// Obtener la posicion de un valor dado.
+	protected Point getPosicion(int valor) {
 		for (int i = 0; i < this.numeros.size(); i++) {
 			for (int j = 0; j < this.numeros.get(i).size(); j++) {
 				if (this.numeros.get(i).get(j).getValor() == valor) {
@@ -156,7 +144,9 @@ public class Estado {
 		throw new NullPointerException("value missing - 0");
 	}
 
-	public void intercambiarPosiciones(int x, int y) {
+	// Intercambio de posiciones, con control de fallo, No es posible
+	// movimientos en diagonal.
+	protected void intercambiarPosiciones(int x, int y) {
 		if ((x == 1 && y == 1) || (x == -1 && y == -1) || (x == 1 && y == -1) || (x == -1 && y == 1)) {
 			throw new NullPointerException("No es posible movimientos en diagonal");
 		}
@@ -171,27 +161,54 @@ public class Estado {
 		this.numeros.get((int) posNextCelda.getX()).set((int) posNextCelda.getY(), aux);
 	}
 
-	public boolean isFinal() {
+	protected boolean isFinal() {
 		return this.equals(estadoFinal);
 	}
 
-	public ArrayList<ArrayList<Celda>> getNumeros() {
+	protected void generateNewPuzzle() {
+		// TODO: random with scanner.
+		this.numeros.get(0).add(new Celda(1, 0, 0));
+		this.numeros.get(0).add(new Celda(3, 0, 1));
+		this.numeros.get(0).add(new Celda(0, 0, 2));
+		this.numeros.get(1).add(new Celda(6, 1, 0));
+		this.numeros.get(1).add(new Celda(2, 1, 1));
+		this.numeros.get(1).add(new Celda(4, 1, 2));
+		this.numeros.get(2).add(new Celda(8, 2, 0));
+		this.numeros.get(2).add(new Celda(7, 2, 1));
+		this.numeros.get(2).add(new Celda(5, 2, 2));
+	}
+
+	protected void addCoste() {
+		coste += COSTE_OPERADOR;
+	}
+
+	// GETTERS && SETTERS
+
+	protected Estado getPadre() {
+		return padre;
+	}
+
+	protected void setPadre(Estado padre) {
+		this.padre = padre;
+	}
+
+	protected ArrayList<ArrayList<Celda>> getNumeros() {
 		return numeros;
 	}
 
-	public void setNumeros(ArrayList<ArrayList<Celda>> numeros) {
+	protected void setNumeros(ArrayList<ArrayList<Celda>> numeros) {
 		this.numeros = numeros;
 	}
 
-	public int getCoste() {
+	protected int getCoste() {
 		return coste;
 	}
 
-	public void setCoste(int coste) {
+	protected void setCoste(int coste) {
 		this.coste = coste;
 	}
 
-	public double getFN(boolean manhattan) {
+	protected Double getFN(boolean manhattan) {
 		return this.coste + (manhattan ? this.getHManhattan() : this.getHCasillasCambiadas());
 	}
 

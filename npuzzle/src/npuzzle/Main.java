@@ -5,7 +5,10 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Puzzle puzzle = new Puzzle();
-		puzzle.generarPuzzle();
+		Estado estadoInicial = puzzle.generarPuzzle();
+
+		puzzle.busquedaCosteUniforme(estadoInicial);
+
 	}
 
 }
