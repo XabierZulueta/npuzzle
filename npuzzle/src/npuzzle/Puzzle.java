@@ -56,14 +56,19 @@ public class Puzzle {
 				switch (busqueda) {
 				case AVARA:
 					// ORDENAMOS SUCESORES EN FUNCION DE FN = H.
+					sucesores.removeIf(estado -> abiertos.contains(estado) || cerrados.contains(estado));
 
-					// TODO: Gestionar abiertos y cerrados
 					sucesores.sort((c1, c2) -> c1.getHeuristica(manhattan).intValue()
 							- c2.getHeuristica(manhattan).intValue());
 					break;
 				case ASTAR:
 					// ORDENAMOS SUCESORES EN FUNCION DE FN = H + G.
 					// TODO: Gestionar abiertos y cerrados
+
+					sucesores.forEach(sucesor -> {
+						abiertos.removeIf(x -> x.equals(sucesor) && x.getFN(manhattan) > sucesor.getFN(manhattan));
+						cerrados.removeIf(x -> x.equals(sucesor) && x.getFN(manhattan) > sucesor.getFN(manhattan));
+					});
 					sucesores.sort((c1, c2) -> c1.getFN(manhattan).intValue() - c2.getFN(manhattan).intValue());
 					break;
 				case UNIFORME:
